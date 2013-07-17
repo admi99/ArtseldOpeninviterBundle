@@ -1,0 +1,35 @@
+artseld_openinviter:
+    #menu:
+    action:
+        import: Import kontaktów
+        send: Wyślij
+        toggle_select: Zaznacz/Odznacz wszystkie
+    link:
+        send_to_another: Wysłać ponownie?
+    label:
+        email: E-mail
+        password: Hasło
+        provider: Dostawca poczty
+        message: Wiadomość
+        recipients: Adresat
+        type_email: Dostawcy poczty
+        type_social: Sieci społecznościowe
+    text:
+        message_subject: Zostałeś zaproszony do %link%
+        message_body: %username% zaprasza Cię do %link%
+        all_done: Zaproszenia wysłane, dziękujemy.
+    notification:
+        success:
+            invitations_sent: Gratulacje, Twoje zaproszenia zostały wysłane poprawnie!
+        error:
+            email_not_set: Nadawca E-mail nie jest ustawiony!
+            no_active_session: Sesja nie jest aktywna!
+            message_missing: Wiadomość nie jest ustawiona!
+            contacts_not_selected: Nie wybrałeś żadnego maila do wysłania!
+            incorrect_login: Niepoprawny login. Proszę sprawdzić E-mail oraz hasło i spróbować ponownie
+            cannot_get_contacts: Nie można pobrać kontaktów!
+            invalid_service_provider: Niepoprawny typ maila!
+            username_instead_email: Proszę podać pełny adres email, a nie samą nazwę
+            email_instead_username: Proszę podać nazwę, a nie pełny adres email
+            invalid_userdomain: <strong>%userdomain%</strong> jest niepoprawny dla tego dostawy poczty
+            invitations_with_errors: Wystąpił błąd podczas wysyłania zaproszeń.<br />Spróbuj ponownie!
