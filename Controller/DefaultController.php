@@ -55,42 +55,48 @@ class DefaultController extends Controller
             $this->_clearSessionVar();
             $this->_setSessionVar(self::SVAR_STEP, self::STEP_LOGIN);
         }
-        $form = $this->get('form.factory')->create(new LoginFormType( $this->openinviter ));
+        $form = $this->get('form.factory')->create(new LoginFormType($this->openinviter));
         if ($request->getMethod() == 'POST') {
-            $form->bindRequest($request);
+            $form->submit($request);
 
             if ($form->isValid()) {
                 $values = $form->getData();
                 $this->openinviter->startPlugin($values['provider']);
                 $internal = $this->openinviter->getInternalError();
                 if ($internal) {
-                    $form->addError(new \Symfony\Component\Form\FormError( $this->_trans($internal) ));
-                } elseif (!$this->openinviter->login( $values['email'], $values['password'] )) {
+                    $form->addError(new \Symfony\Component\Form\FormError($this->_trans($internal)));
+                } elseif (!$this->openinviter->login($values['email'], $values['password'])) {
                     $internal = $this->openinviter->getInternalError();
-                    $form->addError(new \Symfony\Component\Form\FormError( $this->_trans(
-                        $internal ? $internal : 'artseld_openinviter.notification.error.incorrect_login'
-                    )));
+                    $form->addError(
+                        new \Symfony\Component\Form\FormError(
+                            $this->_trans($internal?$internal:'artseld_openinviter.notification.error.incorrect_login')
+                        )
+                    );
                 } elseif (false === $contacts = $this->openinviter->getMyContacts()) {
-                    $form->addError(new \Symfony\Component\Form\FormError(
-                        $this->_trans('artseld_openinviter.notification.error.cannot_get_contacts')
-                    ));
+                    $form->addError(
+                        new \Symfony\Component\Form\FormError(
+                            $this->_trans('artseld_openinviter.notification.error.cannot_get_contacts')
+                        )
+                    );
                 } else {
-                    $this->_setSessionVar(array(
-                        self::SVAR_STEP     => self::STEP_INVITE,
-                        self::SVAR_SESSID   => $this->openinviter->plugin->getSessionID(),
-                        self::SVAR_PROVIDER => $values['provider'],
-                        self::SVAR_EMAIL    => $values['email'],
-                        self::SVAR_CONTACTS => $contacts,
-                    ));
+                    $this->_setSessionVar(
+                        array(
+                            self::SVAR_STEP     => self::STEP_INVITE,
+                            self::SVAR_SESSID   => $this->openinviter->plugin->getSessionID(),
+                            self::SVAR_PROVIDER => $values['provider'],
+                            self::SVAR_EMAIL    => $values['email'],
+                            self::SVAR_CONTACTS => $contacts,
+                        )
+                    );
                     return new RedirectResponse($this->generateUrl('artseld_openinviter_invite'));
                 }
             }
         }
 
         return $this->get('templating')->renderResponse(
-            'ArtseldOpeninviterBundle:Default:login.html.twig', array(
-                'login_form' => $form->createView(),
-            ));
+            'ArtseldOpeninviterBundle:Default:login.html.twig',
+            array('login_form' => $form->createView())
+        );
     }
 
     /**
@@ -106,61 +112,77 @@ class DefaultController extends Controller
             return new RedirectResponse($this->generateUrl('artseld_openinviter_login'));
         }
 
-        $form = $this->get('form.factory')->create(new InviteFormType( $this->_getSessionVar(self::SVAR_CONTACTS) ));
+        $form = $this->get('form.factory')->create(new InviteFormType($this->_getSessionVar(self::SVAR_CONTACTS)));
         if ($request->getMethod() == 'POST') {
-            $form->bindRequest($request);
+            $form->submit($request);
 
             if ($form->isValid()) {
                 $values = $form->getData();
-                $this->openinviter->startPlugin( $this->_getSessionVar(self::SVAR_PROVIDER) );
+                $this->openinviter->startPlugin($this->_getSessionVar(self::SVAR_PROVIDER));
                 $internal = $this->openinviter->getInternalError();
                 if ($internal) {
-                    $form->addError(new \Symfony\Component\Form\FormError( $this->_trans($internal) ));
+                    $form->addError(new \Symfony\Component\Form\FormError($this->_trans($internal)));
                 } else {
                     if (empty($values['email'])) {
-                        $form->addError(new \Symfony\Component\Form\FormError(
-                            $this->_trans('artseld_openinviter.notification.error.email_not_set')
-                        ));
+                        $form->addError(
+                            new \Symfony\Component\Form\FormError(
+                                $this->_trans('artseld_openinviter.notification.error.email_not_set')
+                            )
+                        );
                     }
                     $sessid = $this->_getSessionVar(self::SVAR_SESSID);
                     if (empty($sessid)) {
-                        $form->addError(new \Symfony\Component\Form\FormError(
-                            $this->_trans('artseld_openinviter.notification.error.no_active_session')
-                        ));
+                        $form->addError(
+                            new \Symfony\Component\Form\FormError(
+                                $this->_trans('artseld_openinviter.notification.error.no_active_session')
+                            )
+                        );
                     }
                     if (empty($values['message'])) {
-                        $form->addError(new \Symfony\Component\Form\FormError(
-                            $this->_trans('artseld_openinviter.notification.error.message_missing')
-                        ));
+                        $form->addError(
+                            new \Symfony\Component\Form\FormError(
+                                $this->_trans('artseld_openinviter.notification.error.message_missing')
+                            )
+                        );
                     } else {
                         $values['message'] = strip_tags($values['message']);
                     }
                     $message = array(
-                        'subject'       => $this->_trans('artseld_openinviter.text.message_subject',
-                            array('%link%' => $this->generateUrl('_welcome', array(), true))),
-                        'body'          => $this->_trans('artseld_openinviter.text.message_body',
+                        'subject'       => $this->_trans(
+                            'artseld_openinviter.text.message_subject',
+                            array('%link%' => $this->generateUrl('_welcome', array(), true))
+                        ),
+                        'body'          => $this->_trans(
+                            'artseld_openinviter.text.message_body',
                             array('%username%' => $this->_getSessionVar(self::SVAR_EMAIL),
-                                '%link%' => $this->generateUrl('_welcome', array(), true))) . "\n\r" . $values['message'],
+                            '%link%' => $this->generateUrl('_welcome', array(), true))
+                        ) . "\n\r" . $values['message'],
                         'attachment'    => '',
                     );
                     $selectedContacts = array();
-                    if ($this->openinviter->showContacts())
-                    {
+                    if ($this->openinviter->showContacts()) {
                         $i = 0;
                         foreach ($this->_getSessionVar(self::SVAR_CONTACTS) as $email => $name) {
-                            if (in_array($i, $values['email'])) $selectedContacts[$email] = $name;
+                            if (in_array($i, $values['email'])) {
+                                $selectedContacts[$email] = $name;
+                            }
                             $i++;
                         }
                         if (count($selectedContacts) == 0) {
-                            $form->addError(new \Symfony\Component\Form\FormError(
-                                $this->_trans('artseld_openinviter.notification.error.contacts_not_selected')
-                            ));
+                            $form->addError(
+                                new \Symfony\Component\Form\FormError(
+                                    $this->_trans('artseld_openinviter.notification.error.contacts_not_selected')
+                                )
+                            );
                         }
                     }
                 }
                 if (count($form->getErrors()) == 0) {
                     $sendMessage = $this->openinviter->sendMessage(
-                        $this->_getSessionVar(self::SVAR_SESSID), $message, $selectedContacts);
+                        $this->_getSessionVar(self::SVAR_SESSID),
+                        $message,
+                        $selectedContacts
+                    );
                     $this->openinviter->logout();
                     if ($sendMessage === -1) {
                         foreach ($selectedContacts as $email => $name) {
@@ -171,14 +193,21 @@ class DefaultController extends Controller
                                 ->setBody($message['body'] . $message['attachment']);
                             $this->container->get('mailer')->send($mail);
                         }
-                        $this->_setFlash(self::FLASH_SUCCESS, 'artseld_openinviter.notification.success.invitations_sent');
+                        $this->_setFlash(
+                            self::FLASH_SUCCESS,
+                            'artseld_openinviter.notification.success.invitations_sent'
+                        );
                     } elseif ($sendMessage === false) {
                         $internal = $this->openinviter->getInternalError();
-                        $this->_setFlash(self::FLASH_ERROR, $internal ? $internal
-                            : 'artseld_openinviter.notification.error.invitations_with_errors'
+                        $this->_setFlash(
+                            self::FLASH_ERROR,
+                            $internal ? $internal: 'artseld_openinviter.notification.error.invitations_with_errors'
                         );
                     } else {
-                        $this->_setFlash(self::FLASH_SUCCESS, 'artseld_openinviter.notification.success.invitations_sent');
+                        $this->_setFlash(
+                            self::FLASH_SUCCESS,
+                            'artseld_openinviter.notification.success.invitations_sent'
+                        );
                     }
                     return new RedirectResponse($this->generateUrl('artseld_openinviter_done'));
                 }
@@ -186,9 +215,11 @@ class DefaultController extends Controller
         }
 
         return $this->get('templating')->renderResponse(
-            'ArtseldOpeninviterBundle:Default:invite.html.twig', array(
+            'ArtseldOpeninviterBundle:Default:invite.html.twig',
+            array(
                 'invite_form' => $form->createView(),
-            ));
+            )
+        );
     }
 
     /**
@@ -203,8 +234,9 @@ class DefaultController extends Controller
         $this->_clearSessionVar();
 
         return $this->get('templating')->renderResponse(
-            'ArtseldOpeninviterBundle:Default:done.html.twig', array(
-            ));
+            'ArtseldOpeninviterBundle:Default:done.html.twig',
+            array()
+        );
     }
 
     /**
@@ -212,7 +244,7 @@ class DefaultController extends Controller
      */
     protected function _init()
     {
-        $this->openinviter = new ArtseldOpeninviter( $this->container );
+        $this->openinviter = new ArtseldOpeninviter($this->container);
         $this->oiPlugins = $this->openinviter->getPlugins();
     }
 
@@ -308,7 +340,9 @@ class DefaultController extends Controller
         $sessionVars = array();
 
         foreach ($reflection->getConstants() as $k => $v) {
-            if (substr($k, 0, 5) === 'SVAR_') $sessionVars[$k] = $v;
+            if (substr($k, 0, 5) === 'SVAR_') {
+                $sessionVars[$k] = $v;
+            }
         }
 
         return $sessionVars;
@@ -325,7 +359,7 @@ class DefaultController extends Controller
         if (!in_array($type, array(self::FLASH_SUCCESS, self::FLASH_ERROR))) {
             $type = self::FLASH_ERROR;
         }
-        $this->get('session')->setFlash('artseld_openinviter.notification.' . $type, $message);
+        $this->get('session')->getFlashBag()->add('artseld_openinviter.notification.' . $type, $message);
 
         return $this;
     }

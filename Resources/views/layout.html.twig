@@ -16,16 +16,19 @@
         <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% if app.session.hasFlash('artseld_openinviter.notification.success') %}
-        <div class="artseld_openinviter_notification success">
-            {{ app.session.flash('artseld_openinviter.notification.success')|trans }}
-        </div>
-        {% endif %}
-        {% if app.session.hasFlash('artseld_openinviter.notification.error') %}
-        <div class="artseld_openinviter_notification error">
-            {{ app.session.flash('artseld_openinviter.notification.error')|trans }}
-        </div>
-        {% endif %}
+
+        {% for flashMessage in app.session.flashbag.get('artseld_openinviter.notification.success') %}
+            <div class="artseld_openinviter_notification success">
+                {{ flashMessage|trans }}
+            </div>
+        {% endfor %}
+
+        {% for flashMessage in app.session.flashbag.get('artseld_openinviter.notification.error') %}
+            <div class="artseld_openinviter_notification error">
+                {{ flashMessage|trans }}
+            </div>
+        {% endfor %}
+
         {% block content '' %}
         <div id="artseld_openinviter_copyright"><a href='http://openinviter.com/'>
             <img src='http://openinviter.com/images/banners/banner_blue_1.gif?nr=69900' border='0' alt='Powered by OpenInviter.com' title='Powered by OpenInviter.com'>
