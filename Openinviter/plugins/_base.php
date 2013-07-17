@@ -111,7 +111,7 @@ abstract class openinviter_base
 	 */
 	protected function parseCSV($file, $delimiter=',')
 		{
-		$expr="/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/";
+		$expr="/[,;](?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/";
 		$str = $file;
 		$lines = explode("\n", $str);
 		$field_names = explode($delimiter, array_shift($lines));
@@ -307,7 +307,7 @@ abstract class openinviter_base
 		if ($this->settings['transport']=='curl')
 			{
 			curl_setopt($this->curl, CURLOPT_URL, $url);
-			curl_setopt($this->curl, CURLOPT_POST,false);
+			curl_setopt($this->curl, CURLOPT_POST, false);
 			curl_setopt($this->curl, CURLOPT_HTTPGET ,true);
 			if ($headers)
 				{

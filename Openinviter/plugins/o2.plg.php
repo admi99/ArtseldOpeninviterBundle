@@ -98,13 +98,15 @@ class o2 extends openinviter_base
 			return false;
 			}
 		else $url=$this->login_ok;
+
 		$res=$this->post($url,array('outputformat'=>'outlook'));
-		$temp=$this->parseCSV($res);
+		$temp=$this->parseCSV($res, ';');
+
 		$contacts=array();
 		foreach ($temp as $values)
 			{
 			if (!empty($values[11]))
-				$descriptionArray[$values[11]]=array('first_name'=>(!empty($values[0])?$values[0]:false),
+                $contacts[$values[11]]=array('first_name'=>(!empty($values[0])?$values[0]:false),
 												'middle_name'=>(!empty($values[1])?$values[1]:false),
 												'last_name'=>(!empty($values[3])?$values[3]:false),
 												'nickname'=>(!empty($values[6])?$values[6]:false),
@@ -136,7 +138,7 @@ class o2 extends openinviter_base
 												'aol_messenger'=>false,
 												'other_messenger'=>false,
 											   );
-			}		
+			}
 		foreach ($contacts as $email=>$name) if (!$this->isEmail($email)) unset($contacts[$email]);
 		return $this->returnContacts($contacts);
 		}

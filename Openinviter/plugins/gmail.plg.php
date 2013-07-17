@@ -3,7 +3,7 @@
  *You can send normal email   
  */
 $_pluginInfo=array(
-	'name'=>'GMail',
+	'name'=>'GMail.com',
 	'version'=>'1.4.9',
 	'description'=>"Get the contacts from a GMail account",
 	'base_version'=>'1.8.4',

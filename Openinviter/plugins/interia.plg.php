@@ -1,6 +1,6 @@
 <?php
 $_pluginInfo=array(
-	'name'=>'Interia',
+	'name'=>'Interia.pl',
 	'version'=>'1.0.7',
 	'description'=>"Get the contacts from an Interia.pl account, Plugin developed by Bartosz Zarczynski",
 	'base_version'=>'1.8.0',
@@ -28,7 +28,7 @@ class interia extends openinviter_base
 	
 	public $debug_array=array('initial_get'=>'pocztaLoginForm',
 			  				  'login_post'=>'side-folders',
-			  				  'url_contact'=>'while(1)'
+			  				  'url_contact'=>'status":true'
 							 );
 	private $sid;
 
@@ -84,11 +84,12 @@ class interia extends openinviter_base
 			return false;
 			}
 
-		$pos = strpos($res, "logout,uid,");
-		$this->sid = substr($res, $pos+11, 16);
+		$pos = strpos($res, "interia.pl,uid,");
+
+		$this->sid = substr($res, $pos+15, 16);
 		
 		$this->login_ok = "http://poczta.interia.pl/html/getcontacts,all,1,uid,$this->sid?inpl_network_request=true";
-		
+
 		return true;
 	} 
 
@@ -110,7 +111,7 @@ class interia extends openinviter_base
 			}
 			else $url=$this->login_ok;
 			$res=$this->get($url,true);
-			
+
 			if ($this->checkResponse("url_contact",$res))
 			$this->updateDebugBuffer('url_contact',$this->login_ok,'GET');
 		else
@@ -120,30 +121,20 @@ class interia extends openinviter_base
 			$this->stopPlugin();
 			return false;
 			}
-			
-			$noheader = substr($res, strpos($res, "while(1);[{") + 11, strlen($res) - 2);
-			$lines = explode("},{", $noheader);
-			$i = 0;
-			foreach ($lines as $line)
-			{
-				$data[$i] = explode(",", $line);
-				$i++;
-			}
-	
+
+			$noheader = substr($res, strpos($res, '{"status"'), strlen($res));
+
+            $stuff = json_decode($noheader);
+
 			$contacts = array();
-			foreach ($data as $line=>$param)
-			{
-				foreach ($param as $x)
-				{
-					$pos_mail = strpos($x, "email");
-					$email = substr($x, 9, strlen($x)-10);
-					$pos_firstname = strpos($x, "firstName");
-					if ($pos_firstname != false) $firstname = substr($x, 13, strlen($x)-14);
-					$pos_lastname = strpos($x, "lastName");
-					if ($pos_lastname != false) $lastname = substr($x, 12, strlen($x)-13);
-					if ($pos_mail != false) $contacts[$email] =array('first_name'=>$firstname,'last_name'=>$lastname,'email_1'=>$email);
-				}
-			}
+            foreach ($stuff->data as $contact)
+            {
+                $contacts[$contact->email] = array(
+                    'first_name' => $contact->firstName,
+                    'last_name' => $contact->lastName,
+                    'email_1' => $contact->email
+                );
+            }
 
 			return $this->returnContacts($contacts);
 		}
