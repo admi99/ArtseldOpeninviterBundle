@@ -201,3 +201,4 @@ class onet extends openinviter_base
         return true;
     }
 }
+?>

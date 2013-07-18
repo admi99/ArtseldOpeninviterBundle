@@ -202,3 +202,4 @@ class wp extends openinviter_base
         return true;
     }
 }
+?>
