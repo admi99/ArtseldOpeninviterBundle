@@ -1,7 +1,7 @@
 <?php
 $_pluginInfo=array(
     'name'=>'Onet.pl',
-    'version'=>'1.0.2',
+    'version'=>'1.6.9',
     'description'=>"Get the contacts from a Onet account",
     'base_version'=>'1.6.9',
     'type'=>'email',
@@ -11,9 +11,9 @@ $_pluginInfo=array(
     'imported_details'=>array('first_name','last_name','email_1','email_2','email_3'),
 );
 /**
- * O2 Plugin
+ * Onet Plugin
  *
- * Imports user's contacts from O2's AddressBook
+ * Imports user's contacts from Onet AddressBook
  *
  * @author OpenInviter
  * @version 1.0.0

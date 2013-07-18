@@ -1,7 +1,7 @@
 <?php
 $_pluginInfo=array(
 	'name'=>'O2',
-	'version'=>'1.0.2',
+	'version'=>'1.6.9',
 	'description'=>"Get the contacts from a O2 account",
 	'base_version'=>'1.6.9',
 	'type'=>'email',
@@ -173,5 +173,5 @@ class o2 extends openinviter_base
 		return true;
 		}
 	
-	}	
+	}
 ?>
