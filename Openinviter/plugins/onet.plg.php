@@ -75,6 +75,12 @@ class onet extends openinviter_base
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($arrPost, '', '&'));
         $login = curl_exec($ch);
 
+        // check if login is correct
+        preg_match('<div class="[\w\s]+error">', $login, $matches);
+        if (count($matches)) {
+            return false;
+        }
+
         curl_setopt($ch, CURLOPT_URL, 'https://kontakty.onet.pl');
         curl_setopt($ch, CURLOPT_POST, 0);
         $contactSite = curl_exec($ch);
